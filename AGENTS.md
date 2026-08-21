@@ -4,7 +4,8 @@
 - **Docker only** — do not attempt direct CMake builds (no local ARM toolchain)
 - Use `docker-build.py` — builds Docker image + firmware in one step
   - `python3 docker-build.py -b <Board>` — board from `configs/` dir names (default: `Pico`)
-  - `-c` clean build, `-v` verbose, `-f` flash to board, `-n` nuke first, `-p <path>` flash mount
+  - `-c` clean build, `-v` verbose, `-f` flash to board, `-n` nuke first, `-r` force rebuild Docker image, `-p <path>` flash mount
+  - Builder image: `gp2040-th-builder` (built from this repo's `Dockerfile`; separate from MP2040's `mp2040-builder`)
   - Boards: Pico, Fightboard-v3[-m|-b|-b-m], KB2040, WaveshareZero, Springboard, Blank
 	- When testing, use `Fightboard-v3`
 - Output: `build/GP2040-th_<version>_<sha>_<Board>.uf2`

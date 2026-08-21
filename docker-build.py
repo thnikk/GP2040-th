@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent
-DEFAULT_IMAGE = "gp2040-ce-builder"
+DEFAULT_IMAGE = "gp2040-th-builder"
 DEFAULT_FLASH_PATH = os.path.expandvars("/run/media/$USER/RPI-RP2")
 NUKE_FILE = REPO_ROOT / "tools" / "flash_nuke.uf2"
 
@@ -92,6 +92,46 @@ def run_docker(image, command, extra_args=None, log_file=None, verbose=False):
             log_fh.close()
 
 
+def image_exists(image):
+    """True if the builder image is already present locally."""
+    try:
+        subprocess.run(["docker", "image", "inspect", image],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                       check=True)
+        return True
+    except (subprocess.CalledProcessError, OSError):
+        return False
+
+
+def build_image(image, log_file=None):
+    """Build the Docker builder image (Dockerfile at repo root)."""
+    cmd = ["docker", "build", "-t", image, "."]
+    with subprocess.Popen(
+        cmd, cwd=REPO_ROOT, stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT, text=True
+    ) as proc:
+        for line in proc.stdout:
+            if log_file:
+                with open(log_file, "a") as f:
+                    f.write(line)
+            print(line, end="", flush=True)
+        proc.wait()
+        return proc.returncode
+
+
+def ensure_builder_image(args):
+    """Build the Docker image if it's missing or --rebuild was given."""
+    if args.rebuild or not image_exists(args.image):
+        log_msg("Building Docker image...", args.output)
+        ret = build_image(args.image, args.output)
+        if ret != 0:
+            log_msg(f"Docker image build failed (exit {ret}). "
+                    f"Log: {args.output}", args.output)
+            sys.exit(ret)
+    else:
+        log_msg(f"Using existing image {args.image}", args.output)
+
+
 def main():
     valid_boards = get_valid_boards()
 
@@ -118,6 +158,8 @@ def main():
                         help=f"RPI-RP2 mount point (default: {DEFAULT_FLASH_PATH})")
     parser.add_argument("-t", "--timeout", type=int, default=30,
                         help="Seconds to wait for mount (default: 30)")
+    parser.add_argument("-r", "--rebuild", action="store_true",
+                        help="Force rebuilding the Docker image")
 
     args = parser.parse_args()
 
@@ -130,6 +172,9 @@ def main():
         for b in valid_boards:
             print(f"  {b}", file=sys.stderr)
         sys.exit(1)
+
+    # --- Ensure builder image ---
+    ensure_builder_image(args)
 
     flash_path = resolve_flash_path(args.path)
     flash_dir = Path(flash_path)
