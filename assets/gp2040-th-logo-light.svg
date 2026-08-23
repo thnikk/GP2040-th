@@ -21,10 +21,10 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="1"
-     inkscape:cx="340"
-     inkscape:cy="211.5"
-     inkscape:window-width="2560"
-     inkscape:window-height="1440"
+     inkscape:cx="340.5"
+     inkscape:cy="211"
+     inkscape:window-width="1261"
+     inkscape:window-height="1371"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
@@ -162,9 +162,9 @@
        style="font-weight:200;font-size:170.667px;font-family:Nunito;-inkscape-font-specification:'Nunito Ultra-Light';writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect5);display:inline;fill:#1c1f26;fill-opacity:1;stroke:none;stroke-width:7.55906;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"><tspan
          x="-11"
          y="-21.667838"
-         id="tspan6"><tspan
+         id="tspan2"><tspan
            style="font-weight:normal;-inkscape-font-specification:Nunito"
-           id="tspan5">MP2040</tspan></tspan></text>
+           id="tspan1">MP2040</tspan></tspan></text>
   </g>
   <g
      id="layer2-1"
@@ -181,9 +181,9 @@
        style="font-weight:bold;font-size:133.333px;font-family:Nunito;-inkscape-font-specification:'Nunito Bold';writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect7);display:inline;fill:#1c1f26;fill-opacity:1;stroke:none;stroke-width:7.55906;stroke-linecap:round"><tspan
          x="-167.87305"
          y="277.07148"
-         id="tspan8"><tspan
+         id="tspan4"><tspan
            style="font-weight:normal;-inkscape-font-specification:Nunito"
-           id="tspan7">GP2040-th</tspan></tspan></text>
+           id="tspan3">GP2040-th</tspan></tspan></text>
   </g>
   <path
      id="rect6"
@@ -213,7 +213,7 @@
        r="25" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-size:40px;font-family:Nunito;-inkscape-font-specification:'Nunito Ultra-Bold';writing-mode:lr-tb;direction:ltr;fill:#1c1f26;fill-opacity:1;stroke-width:7.55906;stroke-linecap:round"
+       style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-size:40px;font-family:Nunito;-inkscape-font-specification:'Nunito Ultra-Bold';writing-mode:lr-tb;direction:ltr;display:none;fill:#1c1f26;fill-opacity:1;stroke-width:7.55906;stroke-linecap:round"
        x="164.16202"
        y="98.955627"
        id="text11"><tspan
@@ -223,7 +223,7 @@
          y="98.955627">A</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;font-family:Nunito;-inkscape-font-specification:'Nunito Bold';writing-mode:lr-tb;direction:ltr;fill:#1c1f26;fill-opacity:1;stroke-width:7.55906;stroke-linecap:round"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;font-family:Nunito;-inkscape-font-specification:'Nunito Bold';writing-mode:lr-tb;direction:ltr;display:none;fill:#1c1f26;fill-opacity:1;stroke-width:7.55906;stroke-linecap:round"
        x="216.15234"
        y="50.072655"
        id="text12"><tspan
