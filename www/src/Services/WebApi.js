@@ -728,6 +728,16 @@ async function getPinState() {
 	}
 }
 
+async function getBoardLayout() {
+	try {
+		const response = await Http.get(`${baseUrl}/api/getBoardLayout`);
+		return response.data;
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
+
 async function getHeldPins(abortSignal) {
 	try {
 		const response = await Http.get(`${baseUrl}/api/getHeldPins`, {
@@ -800,6 +810,7 @@ export default {
 	getUsedPins,
 	getExtraPins,
 	getPinState,
+	getBoardLayout,
 	getHeldPins,
 	abortGetHeldPins,
 	reboot,

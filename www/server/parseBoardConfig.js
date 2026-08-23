@@ -62,6 +62,143 @@ const LED_FORMAT_MAP = {
 
 const DPAD_TO_HIGH = { 1: 65536, 2: 131072, 4: 262144, 8: 524288 };
 
+const BUTTON_LAYOUT_MAP = {
+	'BUTTON_LAYOUT_STICK': 0,
+	'BUTTON_LAYOUT_STICKLESS': 1,
+	'BUTTON_LAYOUT_BUTTONS_ANGLED': 2,
+	'BUTTON_LAYOUT_BUTTONS_BASIC': 3,
+	'BUTTON_LAYOUT_KEYBOARD_ANGLED': 4,
+	'BUTTON_LAYOUT_KEYBOARDA': 5,
+	'BUTTON_LAYOUT_DANCEPADA': 6,
+	'BUTTON_LAYOUT_TWINSTICKA': 7,
+	'BUTTON_LAYOUT_BLANKA': 8,
+	'BUTTON_LAYOUT_VLXA': 9,
+	'BUTTON_LAYOUT_FIGHTBOARD_STICK': 10,
+	'BUTTON_LAYOUT_FIGHTBOARD_MIRRORED': 11,
+	'BUTTON_LAYOUT_CUSTOMA': 12,
+	'BUTTON_LAYOUT_OPENCORE0WASDA': 13,
+	'BUTTON_LAYOUT_STICKLESS_13': 14,
+	'BUTTON_LAYOUT_STICKLESS_16': 15,
+	'BUTTON_LAYOUT_STICKLESS_14': 16,
+	'BUTTON_LAYOUT_DANCEPAD_DDR_LEFT': 17,
+	'BUTTON_LAYOUT_DANCEPAD_DDR_SOLO': 18,
+	'BUTTON_LAYOUT_DANCEPAD_PIU_LEFT': 19,
+	'BUTTON_LAYOUT_POPN_A': 20,
+	'BUTTON_LAYOUT_TAIKO_A': 21,
+	'BUTTON_LAYOUT_BM_TURNTABLE_A': 22,
+	'BUTTON_LAYOUT_BM_5KEY_A': 23,
+	'BUTTON_LAYOUT_BM_7KEY_A': 24,
+	'BUTTON_LAYOUT_GITADORA_FRET_A': 25,
+	'BUTTON_LAYOUT_GITADORA_STRUM_A': 26,
+	'BUTTON_LAYOUT_BOARD_DEFINED_A': 27,
+	'BUTTON_LAYOUT_BANDHERO_FRET_A': 28,
+	'BUTTON_LAYOUT_BANDHERO_STRUM_A': 29,
+	'BUTTON_LAYOUT_6GAWD_A': 30,
+	'BUTTON_LAYOUT_6GAWD_ALLBUTTON_A': 31,
+	'BUTTON_LAYOUT_6GAWD_ALLBUTTONPLUS_A': 32,
+	'BUTTON_LAYOUT_STICKLESS_R16': 33,
+};
+
+const BUTTON_LAYOUT_RIGHT_MAP = {
+	'BUTTON_LAYOUT_ARCADE': 0,
+	'BUTTON_LAYOUT_STICKLESSB': 1,
+	'BUTTON_LAYOUT_BUTTONS_ANGLEDB': 2,
+	'BUTTON_LAYOUT_VEWLIX': 3,
+	'BUTTON_LAYOUT_VEWLIX7': 4,
+	'BUTTON_LAYOUT_CAPCOM': 5,
+	'BUTTON_LAYOUT_CAPCOM6': 6,
+	'BUTTON_LAYOUT_SEGA2P': 7,
+	'BUTTON_LAYOUT_NOIR8': 8,
+	'BUTTON_LAYOUT_KEYBOARDB': 9,
+	'BUTTON_LAYOUT_DANCEPADB': 10,
+	'BUTTON_LAYOUT_TWINSTICKB': 11,
+	'BUTTON_LAYOUT_BLANKB': 12,
+	'BUTTON_LAYOUT_VLXB': 13,
+	'BUTTON_LAYOUT_FIGHTBOARD': 14,
+	'BUTTON_LAYOUT_FIGHTBOARD_STICK_MIRRORED': 15,
+	'BUTTON_LAYOUT_CUSTOMB': 16,
+	'BUTTON_LAYOUT_KEYBOARD8B': 17,
+	'BUTTON_LAYOUT_OPENCORE0WASDB': 18,
+	'BUTTON_LAYOUT_STICKLESS_13B': 19,
+	'BUTTON_LAYOUT_STICKLESS_16B': 20,
+	'BUTTON_LAYOUT_STICKLESS_14B': 21,
+	'BUTTON_LAYOUT_DANCEPAD_DDR_RIGHT': 22,
+	'BUTTON_LAYOUT_DANCEPAD_PIU_RIGHT': 23,
+	'BUTTON_LAYOUT_POPN_B': 24,
+	'BUTTON_LAYOUT_TAIKO_B': 25,
+	'BUTTON_LAYOUT_BM_TURNTABLE_B': 26,
+	'BUTTON_LAYOUT_BM_5KEY_B': 27,
+	'BUTTON_LAYOUT_BM_7KEY_B': 28,
+	'BUTTON_LAYOUT_GITADORA_FRET_B': 29,
+	'BUTTON_LAYOUT_GITADORA_STRUM_B': 30,
+	'BUTTON_LAYOUT_BOARD_DEFINED_B': 31,
+	'BUTTON_LAYOUT_BANDHERO_FRET_B': 32,
+	'BUTTON_LAYOUT_BANDHERO_STRUM_B': 33,
+	'BUTTON_LAYOUT_6GAWD_B': 34,
+	'BUTTON_LAYOUT_6GAWD_ALLBUTTON_B': 35,
+	'BUTTON_LAYOUT_6GAWD_ALLBUTTONPLUS_B': 36,
+	'BUTTON_LAYOUT_STICKLESS_R16B': 37,
+	'BUTTON_LAYOUT_VLXB_6B': 38,
+	'BUTTON_LAYOUT_SEGA2P_6B': 39,
+};
+
+const GP_ELEMENT_MAP = {
+	'GP_ELEMENT_WIDGET': 0,
+	'GP_ELEMENT_SCREEN': 1,
+	'GP_ELEMENT_BTN_BUTTON': 2,
+	'GP_ELEMENT_DIR_BUTTON': 3,
+	'GP_ELEMENT_PIN_BUTTON': 4,
+	'GP_ELEMENT_LEVER': 5,
+	'GP_ELEMENT_LABEL': 6,
+	'GP_ELEMENT_SPRITE': 7,
+	'GP_ELEMENT_SHAPE': 8,
+};
+
+const GP_SHAPE_MAP = {
+	'GP_SHAPE_ELLIPSE': 0,
+	'GP_SHAPE_SQUARE': 1,
+	'GP_SHAPE_LINE': 2,
+	'GP_SHAPE_POLYGON': 3,
+	'GP_SHAPE_ARC': 4,
+};
+
+function parseLayoutMacro(macroStr) {
+	if (typeof macroStr !== 'string') return [];
+	const entries = [];
+	const re = /\{GP_ELEMENT_(\w+),\s*\{([^}]+)\}\}/g;
+	let m;
+	while ((m = re.exec(macroStr)) !== null) {
+		const parts = m[2].split(',').map((s) => s.trim());
+		const toNum = (v) => {
+			const n = parseInt(v, 10);
+			return isNaN(n) ? 0 : n;
+		};
+		entries.push({
+			elementType: GP_ELEMENT_MAP[`GP_ELEMENT_${m[1]}`] ?? 0,
+			parameters: {
+				x1: toNum(parts[0]),
+				y1: toNum(parts[1]),
+				x2: toNum(parts[2]),
+				y2: toNum(parts[3]),
+				stroke: toNum(parts[4]),
+				fill: toNum(parts[5]),
+				value: toNum(parts[6]),
+				shape: GP_SHAPE_MAP[parts[7]] ?? toNum(parts[7]),
+				angleStart: toNum(parts[8]),
+				angleEnd: toNum(parts[9]),
+				closed: toNum(parts[10]),
+			},
+		});
+	}
+	return entries;
+}
+
+function parseIntDef(raw, def) {
+	if (raw === undefined || raw === true) return def;
+	const n = parseInt(raw, 10);
+	return isNaN(n) ? def : n;
+}
+
 function evalBitExpr(str) {
 	if (str === undefined || str === true) return 0;
 	const cleaned = String(str).replace(/\s+/g, '');
@@ -182,6 +319,23 @@ function buildBoardConfig(rawDefines, configDir, rootDir) {
 	const hasSvg = rawDefines.BOARD_SVG !== undefined;
 	const svgPath = hasSvg ? path.join(rootDir, 'configs', configDir, 'board.svg') : null;
 
+	const buttonLayoutValue = resolveValue(rawDefines.BUTTON_LAYOUT, BUTTON_LAYOUT_MAP);
+	const buttonLayoutRightValue = resolveValue(rawDefines.BUTTON_LAYOUT_RIGHT, BUTTON_LAYOUT_RIGHT_MAP);
+	const buttonLayout = typeof buttonLayoutValue === 'number' ? buttonLayoutValue : undefined;
+	const buttonLayoutRight = typeof buttonLayoutRightValue === 'number' ? buttonLayoutRightValue : undefined;
+	const boardLayoutA = parseLayoutMacro(rawDefines.DEFAULT_BOARD_LAYOUT_A);
+	const boardLayoutB = parseLayoutMacro(rawDefines.DEFAULT_BOARD_LAYOUT_B);
+
+	const displayDefaults = {
+		inputHistoryEnabled: parseIntDef(rawDefines.INPUT_HISTORY_ENABLED, 0),
+		inputHistoryLength: parseIntDef(rawDefines.INPUT_HISTORY_LENGTH, 21),
+		inputHistoryCol: parseIntDef(rawDefines.INPUT_HISTORY_COL, 0),
+		inputHistoryRow: parseIntDef(rawDefines.INPUT_HISTORY_ROW, 7),
+		inputHistoryTimeout: parseIntDef(rawDefines.INPUT_HISTORY_TIMEOUT, 0),
+		displaySaverTimeout: parseIntDef(rawDefines.DISPLAY_SAVER_TIMEOUT, 0),
+		splashDuration: parseIntDef(rawDefines.SPLASH_DURATION, 7500),
+	};
+
 	let boardConfigLabel = configDir;
 	if (rawDefines.BOARD_CONFIG_LABEL !== undefined) {
 		const match = rawDefines.BOARD_CONFIG_LABEL.match(/"([^"]*)"/);
@@ -272,6 +426,11 @@ function buildBoardConfig(rawDefines, configDir, rootDir) {
 		configDir,
 		hasSvg,
 		svgPath,
+		buttonLayout,
+		buttonLayoutRight,
+		boardLayoutA,
+		boardLayoutB,
+		displayDefaults,
 		pinDefaults,
 		pinLedIndices,
 		hasI2cDisplay: rawDefines.HAS_I2C_DISPLAY !== undefined && !!parseInt(rawDefines.HAS_I2C_DISPLAY, 10),

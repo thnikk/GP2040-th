@@ -29,6 +29,7 @@ import LedColorPopover from '../components/shared/LedColorPopover';
 import { BUTTONS, getButtonLabels } from '../Data/Buttons';
 import { BUTTON_ACTIONS, PinActionValues } from '../Data/Pins';
 import { useBoardSVG } from '../hooks/useBoardSVG';
+import { useDisplayEmulator } from '../hooks/useDisplayEmulator';
 import WebApi from '../Services/WebApi';
 import InfoCircle from '../Icons/InfoCircle';
 import Lightbulb from '../Icons/Lightbulb';
@@ -208,6 +209,12 @@ const PinSection = memo(function PinSection({
 	const [pressedPins, setPressedPins] = useState<number[]>([]);
 	const stopRef = useRef(false);
 
+	const displayEmulator = useDisplayEmulator({
+		heldPins: pressedPins,
+		profileIndex,
+		enabled: showDisplay && svgMode,
+	});
+
 	const pollPins = useCallback(async () => {
 		if (stopRef.current) return;
 		try {
@@ -383,6 +390,7 @@ const PinSection = memo(function PinSection({
 						onTestToggle={handleTestToggle}
 						showPerKeyLeds={showPerKeyLeds}
 						showDisplay={showDisplay}
+						displayEmulator={displayEmulator}
 					/>
 					) : (
 						<div className="alert alert-info">

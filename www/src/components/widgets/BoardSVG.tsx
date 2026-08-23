@@ -72,6 +72,7 @@ type BoardSVGProps = {
 	onTestToggle?: () => void;
 	showPerKeyLeds?: boolean;
 	showDisplay?: boolean;
+	displayEmulator?: import('../../hooks/useDisplayEmulator').DisplayEmulatorHandle | null;
 };
 
 const ACTION_LABELS: Record<PinActionValues, string> = {
@@ -291,6 +292,7 @@ export default function BoardSVG({
 	onTestToggle,
 	showPerKeyLeds = true,
 	showDisplay = true,
+	displayEmulator,
 }: BoardSVGProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { buttonLabels, useNintendoLayout } = useContext(AppContext);
@@ -770,6 +772,50 @@ export default function BoardSVG({
 			if (logo) (logo as HTMLElement).style.removeProperty('display');
 		}
 	}, [showPerKeyLeds, showDisplay]);
+
+	useEffect(() => {
+		if (!containerRef.current || !svgContent || !showDisplay || !displayEmulator) return;
+		const svgContainer = containerRef.current;
+		const oledEl = svgContainer.querySelector('#oled');
+		if (!oledEl) return;
+
+		const logoEl = svgContainer.querySelector('#logo');
+		if (logoEl) (logoEl as HTMLElement).style.setProperty('display', 'none', 'important');
+
+		const svgNs = 'http://www.w3.org/2000/svg';
+		const image = document.createElementNS(svgNs, 'image');
+		image.setAttribute('id', 'oled-preview');
+		image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+		const oledX = parseFloat(oledEl.getAttribute('x') || '0');
+		const oledY = parseFloat(oledEl.getAttribute('y') || '0');
+		const oledW = parseFloat(oledEl.getAttribute('width') || '128');
+		const oledH = parseFloat(oledEl.getAttribute('height') || '64');
+		const marginX = oledW * 0.08;
+		const marginY = oledH * 0.05;
+		image.setAttribute('x', String(oledX + marginX));
+		image.setAttribute('y', String(oledY + marginY));
+		image.setAttribute('width', String(oledW - marginX * 2));
+		image.setAttribute('height', String(oledH - marginY * 2));
+		oledEl.parentNode?.insertBefore(image, oledEl.nextSibling);
+
+		let raf = 0;
+		let lastRender = 0;
+		const loop = (now: number) => {
+			raf = requestAnimationFrame(loop);
+			if (now - lastRender < 33) return;
+			lastRender = now;
+			displayEmulator.renderFrame(now);
+			const canvas = displayEmulator.getCanvas();
+			if (canvas) image.setAttribute('href', canvas.toDataURL('image/png'));
+		};
+		raf = requestAnimationFrame(loop);
+
+		return () => {
+			cancelAnimationFrame(raf);
+			image.remove();
+			if (logoEl) (logoEl as HTMLElement).style.removeProperty('display');
+		};
+	}, [svgContent, showDisplay, displayEmulator]);
 
 	const processedSvg = useMemo(() => prepareSvg(svgContent), [svgContent]);
 

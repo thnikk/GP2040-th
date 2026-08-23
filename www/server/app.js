@@ -80,13 +80,13 @@ app.get('/api/getDisplayOptions', (req, res) => {
 	const data = {
 		enabled: boardConfig?.hasI2cDisplay ?? 1,
 		flipDisplay: 0,
-		invertDisplay: 1,
-		buttonLayout: 0,
-		buttonLayoutRight: 3,
+		invertDisplay: 0,
+		buttonLayout: boardConfig?.buttonLayout ?? 0,
+		buttonLayoutRight: boardConfig?.buttonLayoutRight ?? 3,
 		buttonLayoutOrientation: 0,
 		splashMode: 3,
 		splashChoice: 0,
-		splashDuration: 0,
+		splashDuration: boardConfig?.displayDefaults?.splashDuration ?? 0,
 		buttonLayoutCustomOptions: {
 			params: {
 				layout: 2,
@@ -104,7 +104,7 @@ app.get('/api/getDisplayOptions', (req, res) => {
 			},
 		},
 
-		displaySaverTimeout: 0,
+		displaySaverTimeout: boardConfig?.displayDefaults?.displaySaverTimeout ?? 0,
 		displaySaverMode: 0,
 		turnOffWhenSuspended: 0,
 		inputMode: 1,
@@ -113,10 +113,11 @@ app.get('/api/getDisplayOptions', (req, res) => {
 		socdMode: 1,
 		macroMode: 1,
 		profileMode: 0,
-		inputHistoryEnabled: 0,
-		inputHistoryLength: 21,
-		inputHistoryCol: 0,
-		inputHistoryRow: 7,
+		inputHistoryEnabled: boardConfig?.displayDefaults?.inputHistoryEnabled ?? 0,
+		inputHistoryLength: boardConfig?.displayDefaults?.inputHistoryLength ?? 21,
+		inputHistoryCol: boardConfig?.displayDefaults?.inputHistoryCol ?? 0,
+		inputHistoryRow: boardConfig?.displayDefaults?.inputHistoryRow ?? 7,
+		inputHistoryTimeout: boardConfig?.displayDefaults?.inputHistoryTimeout ?? 0,
 	};
 	console.log('data', data);
 	return res.send(data);
@@ -128,6 +129,13 @@ app.get('/api/getSplashImage', (req, res) => {
 	};
 	console.log('data', data);
 	return res.send(data);
+});
+
+app.get('/api/getBoardLayout', (req, res) => {
+	return res.send({
+		layoutA: boardConfig?.boardLayoutA ?? [],
+		layoutB: boardConfig?.boardLayoutB ?? [],
+	});
 });
 
 let gamepadOptionsStore = null;

@@ -5,8 +5,31 @@
    height="298.58493"
    version="1.1"
    id="svg56"
+   sodipodi:docname="gp2040-th-logo-light.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#7f7f7f"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.0109126"
+     inkscape:cx="106.83416"
+     inkscape:cy="107.32876"
+     inkscape:window-width="2560"
+     inkscape:window-height="1440"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg56" />
   <desc
      id="desc1">logo-thnikk.dxf - scale = 1.000000, origin = (0.000000, 0.000000), method = manual</desc>
   <defs
@@ -91,7 +114,8 @@
   <g
      id="g6"
      transform="translate(291.10972)"
-     style="display:none">
+     style="display:none"
+     inkscape:label="MP2040">
     <path
        id="rect1"
        style="display:inline;fill:#1c1f26;fill-opacity:1;stroke:none;stroke-width:8.17453;stroke-linecap:round;stroke-dasharray:none"
@@ -111,7 +135,9 @@
            id="tspan3">MP2040</tspan></tspan></text>
   </g>
   <g
+     inkscape:groupmode="layer"
      id="layer2-1"
+     inkscape:label="GP2040-th"
      style="display:inline"
      transform="translate(11.873229)">
     <path
@@ -133,6 +159,7 @@
      id="rect6"
      mask="none"
      style="display:inline;fill:#1c1f26;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;paint-order:markers stroke fill"
+     inkscape:label="Logo"
      d="M 60.972311,0 C 27.193576,0 -3.45e-4,27.193921 -3.45e-4,60.972656 c 0,33.778736 27.193921,60.972654 60.972656,60.972654 H 167.8727 c 33.77874,0 60.97266,-27.193918 60.97266,-60.972654 C 228.84536,27.193921 201.65144,0 167.8727,0 Z m 2.177735,18.236328 c 10.37525,0.533041 20.440724,4.831345 28.083984,12.47461 a 5,5 0 0 1 0,7.070312 5,5 0 0 1 -7.072266,0 c -9.38952,-9.389529 -23.470761,-12.188988 -35.738281,-7.107422 -12.26748,5.081553 -20.24414,17.019853 -20.24414,30.298828 0,13.278975 7.97666,25.217276 20.24414,30.298828 12.26752,5.081566 26.348761,2.280155 35.738281,-7.109375 L 137.61294,30.710938 c 12.2292,-12.229205 30.65883,-15.893907 46.63672,-9.275391 15.97787,6.618505 26.41796,22.242713 26.41796,39.537109 0,17.294396 -10.44009,32.9186 -26.41796,39.537114 -15.97788,6.61851 -34.40752,2.95186 -46.63672,-9.277348 a 5,5 0 0 1 0,-7.070313 5,5 0 0 1 7.07031,0 c 9.38952,9.389514 23.47273,12.19094 35.74023,7.109375 12.26748,-5.081551 20.24414,-17.019866 20.24414,-30.298828 0,-13.278961 -7.97666,-25.217277 -20.24414,-30.298828 -12.2675,-5.081565 -26.35071,-2.280139 -35.74023,7.109375 L 91.23403,91.232422 C 79.00482,103.46164 60.573258,107.12828 44.595358,100.50977 28.617478,93.891256 18.179343,78.267067 18.179343,60.972656 c 0,-17.29441 10.438135,-32.920557 26.416015,-39.539062 5.99171,-2.481944 12.329528,-3.51709 18.554688,-3.197266 z"
      transform="translate(291.10972)" />
 </svg>
