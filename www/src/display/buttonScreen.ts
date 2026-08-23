@@ -669,41 +669,41 @@ export class ButtonLayoutScreen {
 		this.statusBarRight = this.statusBarRight.trimStart();
 	}
 
+	// Match firmware: mask to DPAD nibble then exact-compare, so cardinal
+	// directions are false when a diagonal is held (e.g. DOWN alone is false
+	// when dpad = DOWN|RIGHT).
+	private dpad(input: GamepadInput): number {
+		return (
+			input.dpad &
+			(GAMEPAD_MASK.UP |
+				GAMEPAD_MASK.DOWN |
+				GAMEPAD_MASK.LEFT |
+				GAMEPAD_MASK.RIGHT)
+		);
+	}
 	private pressedUp(input: GamepadInput): boolean {
-		return (input.dpad & GAMEPAD_MASK.UP) === GAMEPAD_MASK.UP;
+		return this.dpad(input) === GAMEPAD_MASK.UP;
 	}
 	private pressedDown(input: GamepadInput): boolean {
-		return (input.dpad & GAMEPAD_MASK.DOWN) === GAMEPAD_MASK.DOWN;
+		return this.dpad(input) === GAMEPAD_MASK.DOWN;
 	}
 	private pressedLeft(input: GamepadInput): boolean {
-		return (input.dpad & GAMEPAD_MASK.LEFT) === GAMEPAD_MASK.LEFT;
+		return this.dpad(input) === GAMEPAD_MASK.LEFT;
 	}
 	private pressedRight(input: GamepadInput): boolean {
-		return (input.dpad & GAMEPAD_MASK.RIGHT) === GAMEPAD_MASK.RIGHT;
+		return this.dpad(input) === GAMEPAD_MASK.RIGHT;
 	}
 	private pressedUpLeft(input: GamepadInput): boolean {
-		return (
-			(input.dpad & (GAMEPAD_MASK.UP | GAMEPAD_MASK.LEFT)) ===
-			(GAMEPAD_MASK.UP | GAMEPAD_MASK.LEFT)
-		);
+		return this.dpad(input) === (GAMEPAD_MASK.UP | GAMEPAD_MASK.LEFT);
 	}
 	private pressedUpRight(input: GamepadInput): boolean {
-		return (
-			(input.dpad & (GAMEPAD_MASK.UP | GAMEPAD_MASK.RIGHT)) ===
-			(GAMEPAD_MASK.UP | GAMEPAD_MASK.RIGHT)
-		);
+		return this.dpad(input) === (GAMEPAD_MASK.UP | GAMEPAD_MASK.RIGHT);
 	}
 	private pressedDownLeft(input: GamepadInput): boolean {
-		return (
-			(input.dpad & (GAMEPAD_MASK.DOWN | GAMEPAD_MASK.LEFT)) ===
-			(GAMEPAD_MASK.DOWN | GAMEPAD_MASK.LEFT)
-		);
+		return this.dpad(input) === (GAMEPAD_MASK.DOWN | GAMEPAD_MASK.LEFT);
 	}
 	private pressedDownRight(input: GamepadInput): boolean {
-		return (
-			(input.dpad & (GAMEPAD_MASK.DOWN | GAMEPAD_MASK.RIGHT)) ===
-			(GAMEPAD_MASK.DOWN | GAMEPAD_MASK.RIGHT)
-		);
+		return this.dpad(input) === (GAMEPAD_MASK.DOWN | GAMEPAD_MASK.RIGHT);
 	}
 	private pressedButton(input: GamepadInput, mask: number): boolean {
 		return (input.buttons & mask) === mask;
