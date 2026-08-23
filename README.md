@@ -1,8 +1,7 @@
 <p align="center">
-  <a href="https://github.com/thnikk/GP2040-th">
-    <img alt="Logo" src="www/public/images/logo.svg" />
-  </a>
-</p>
+	<img alt="Logo" src="assets/gp2040-th-logo.svg#gh-dark-mode-only" width="300px" />
+	<img alt="Logo" src="assets/gp2040-th-logo-light.svg#gh-light-mode-only" width="300px" />
+</p><br>
 
 <p align="center">
   Fork of <a href="https://github.com/OpenStickCommunity/GP2040-CE">GP2040-CE</a>
