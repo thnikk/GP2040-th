@@ -2,7 +2,7 @@ export default {
 	'add-ons-label': 'Add-Ons Configuration',
 	'button-layout-label': 'Button Layout',
 	'backup-label': 'Backup & Restore',
-	'config-label': 'Configuration',
+	'config-label': 'Advanced',
 	'custom-theme-label': 'Custom LED Theme',
 	'display-config-label': 'Display Configuration',
 	'docs-label': 'Documentation',

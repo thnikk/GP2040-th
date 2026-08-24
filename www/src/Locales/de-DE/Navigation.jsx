@@ -1,7 +1,7 @@
 export default {
 	'add-ons-label': 'Add-Ons Konfiguration',
 	'backup-label': 'Daten-Backup und Wiederherstellung',
-	'config-label': 'Konfiguration',
+	'config-label': 'Erweitert',
 	'custom-theme-label': 'Benutzerdefinierte LED Thema',
 	'display-config-label': 'Display Konfiguration',
 	'docs-label': 'Dokumentation',
