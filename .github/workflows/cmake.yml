@@ -15,10 +15,7 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  call-node-workflow:
-    uses: ./.github/workflows/node.js.yml
   build:
-    needs: call-node-workflow
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -43,11 +40,12 @@ jobs:
     - name: Setup SDK pipeline
       uses: Fortinbra/RaspberryPiPicoBuild@v3
 
-    - name: Download a Build Artifact
-      uses: actions/download-artifact@v4.1.2
+    - name: Use Node.js
+      uses: actions/setup-node@v4.0.2
       with:
-        name: fsData
-        path: ${{github.workspace}}/lib/httpd/
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: www/package-lock.json
 
     - name: Get core count
       id: core_count
@@ -76,12 +74,12 @@ jobs:
     - name: Pico Build Configure CMake
       shell: bash
       if: ${{ matrix.GP2040_BOARDCONFIG != 'PicoW'}}
-      run: PICO_SDK_PATH=${{github.workspace}}/pico-sdk GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} SKIP_WEBBUILD=TRUE cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: PICO_SDK_PATH=${{github.workspace}}/pico-sdk GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: PicoW Build Configure CMake
       shell: bash
       if: ${{ matrix.GP2040_BOARDCONFIG == 'PicoW'}}
-      run: PICO_SDK_PATH=${{github.workspace}}/pico-sdk GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} SKIP_WEBBUILD=TRUE cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DPICO_BOARD=pico_w
+      run: PICO_SDK_PATH=${{github.workspace}}/pico-sdk GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DPICO_BOARD=pico_w
 
     - name: Pico Build
       shell: bash
