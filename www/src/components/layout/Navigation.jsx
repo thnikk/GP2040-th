@@ -49,39 +49,7 @@ const Navigation = () => {
 		<Navbar collapseOnSelect expand="md" fixed="top">
 				<Navbar.Brand title={`GP2040-th ${t('Navigation:home-label')}`}>
 				<Nav.Link as={NavLink} to="/" eventKey={eventKey++} className="logo-link">
-					<svg
-						viewBox="0 0 228.846 121.94489"
-						className="title-logo"
-						xmlns="http://www.w3.org/2000/svg"
-						height="40"
-					>
-						<defs>
-							<mask
-								maskUnits="userSpaceOnUse"
-								id="navbar-logo-mask"
-							>
-								<path
-									fill="#ffffff"
-									d="M -1,-1 H 229.84601 V 122.94489 H -1 Z"
-								/>
-								<path
-									fill="none"
-									stroke="#000000"
-									strokeWidth="20"
-									strokeLinecap="round"
-									d="m 141.1483,87.697756 a 37.795276,37.795276 0 1 0 0,-53.4506 l -53.4506,53.45 a 37.7953,37.7953 0 1 1 0,-53.4506"
-								/>
-							</mask>
-						</defs>
-						<rect
-							fill="currentColor"
-							rx="60.972446"
-							ry="60.972446"
-							width="228.846"
-							height="121.945"
-							mask="url(#navbar-logo-mask)"
-						/>
-					</svg>
+					<span className="title-logo" />
 				</Nav.Link>
 			</Navbar.Brand>
 			<Navbar.Toggle aria-controls="responsive-navbar-nav" />
