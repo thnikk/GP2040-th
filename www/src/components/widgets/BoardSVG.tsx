@@ -527,10 +527,8 @@ export default function BoardSVG({
 	            const svgEl = shape as HTMLElement;
 	            const origFill = originalFills.current.get(`${id}-${shapeIndex}`)?.fill || '';
 	            if (isHighlighted) {
-	                svgEl.style.setProperty('fill', '#3d3d00', 'important');
-	                svgEl.style.setProperty('stroke', '#ffff00', 'important');
+	                svgEl.style.setProperty('stroke', '#ebcb8b', 'important');
 	                svgEl.style.setProperty('stroke-width', '3', 'important');
-	                svgEl.style.removeProperty('fill-opacity');
 	            } else if (action === BUTTON_ACTIONS.NONE || action === undefined) {
 	                svgEl.style.setProperty('fill', hasLedElements ? 'var(--bg-2)' : 'var(--bg-1)', 'important');
 	                svgEl.style.setProperty('fill-opacity', hasLedElements ? '1' : '0.2', 'important');
