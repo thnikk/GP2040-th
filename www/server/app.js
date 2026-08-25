@@ -804,9 +804,11 @@ app.get('/api/getMemoryReport', (req, res) => {
 });
 
 app.get('/api/getPinState', (req, res) => {
-	return res.send({
-		heldPins: [],
-	});
+	// The board long-polls this: it parks the request and answers only when a
+	// pin changes. Mirror that here by never responding, so the frontend's
+	// long-poll stays parked instead of tight-looping against the mock.
+	void req;
+	void res;
 });
 
 app.get('/api/getHeldPins', async (req, res) => {

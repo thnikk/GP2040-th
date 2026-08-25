@@ -56,6 +56,30 @@ static uint16_t http_post_payload_len = 0;
 static absolute_time_t rebootDelayTimeout = nil_time;
 static System::BootMode rebootMode = System::BootMode::DEFAULT;
 
+// ---- long-polled /api/getPinState ---------------------------------------
+// The web UI keeps a single HTTP request open instead of polling. httpd's
+// async-read path parks the connection (fs_read_async returns FS_READ_DELAYED)
+// and we answer it from WebConfig::loop() only when the GPIO pin state
+// changes, so idle traffic is zero. Clients immediately re-request after each
+// response, giving change-driven updates with no fixed interval.
+
+#define MAX_PENDING_PIN_STATE 4
+
+struct PinStateFile
+{
+    struct fs_file *file;    // the parked HTTP request (valid until fs_close)
+    fs_wait_cb callback;     // httpd's http_continue, filled by fs_wait_read_custom
+    void *callbackArg;
+    bool ready;
+    char data[256];          // full HTTP response (header + JSON body)
+};
+
+static PinStateFile *pendingPinState[MAX_PENDING_PIN_STATE] = {};
+static uint32_t lastDeliveredPinState = 0;
+static bool hasDeliveredPinState = false; // force a snapshot on first request
+
+static void deliverPinState();
+
 // Don't inline this function, we do not want to consume stack space in the calling function
 template <typename T, typename K>
 static void __attribute__((noinline)) readDoc(T& var, const DynamicJsonDocument& doc, const K& key)
@@ -263,6 +287,9 @@ void WebConfig::setup() {
 void WebConfig::loop() {
     // rndis http server requires inline functions (non-class)
     rndis_task();
+
+    // Answer any parked /api/getPinState requests when the pin state changed.
+    deliverPinState();
 
     if (!is_nil_time(rebootDelayTimeout) && time_reached(rebootDelayTimeout)) {
         System::reboot(rebootMode);
@@ -2417,6 +2444,154 @@ std::string getMemoryReport()
 
 static bool _abortGetHeldPins = false;
 
+// ---- long-poll helpers --------------------------------------------------
+
+// Only pins configured as pulled-up inputs (the mapped buttons) are reported.
+// Raw gpio_get_all() includes PIO/USB/LED output pins and floating pads that
+// toggle constantly, which would otherwise answer every parked request.
+static uint32_t readPinState()
+{
+    const uint32_t rawState = ~gpio_get_all();
+    uint32_t stableState = 0;
+    for (uint32_t pin = 0; pin < NUM_BANK0_GPIOS; pin++) {
+        if ((rawState & (1 << pin)) &&
+            gpio_get_function(pin) == GPIO_FUNC_SIO &&
+            !gpio_is_dir_out(pin) &&
+            gpio_is_pulled_up(pin)) {
+            stableState |= 1 << pin;
+        }
+    }
+    return stableState;
+}
+
+static std::string pinStateJson(uint32_t state)
+{
+    std::string json = "{\"heldPins\":[";
+    bool first = true;
+    for (uint32_t pin = 0; pin < NUM_BANK0_GPIOS; pin++) {
+        if (state & (1 << pin)) {
+            if (!first)
+                json += ',';
+            json += std::to_string(pin);
+            first = false;
+        }
+    }
+    json += "]}";
+    return json;
+}
+
+static int fillPinStateResponse(PinStateFile *ctx, uint32_t state)
+{
+    const std::string body = pinStateJson(state);
+    int n = snprintf(ctx->data, sizeof(ctx->data),
+        "HTTP/1.0 200 OK\r\n"
+        "Server: GP2040-th " GP2040VERSION "\r\n"
+        "Content-Type: application/json\r\n"
+        "Access-Control-Allow-Origin: *\r\n"
+        "Content-Length: %d\r\n"
+        "\r\n"
+        "%s",
+        (int)body.size(), body.c_str());
+    return (n > 0 && n < (int)sizeof(ctx->data)) ? n : 0;
+}
+
+// Fill every parked request's file with the current state and let httpd send.
+// The callback (httpd's http_continue) resumes the parked connection.
+static void deliverToParked(uint32_t state)
+{
+    for (int i = 0; i < MAX_PENDING_PIN_STATE; i++)
+    {
+        PinStateFile *ctx = pendingPinState[i];
+        if (ctx == NULL)
+            continue;
+        pendingPinState[i] = NULL;
+
+        int len = fillPinStateResponse(ctx, state);
+        if (len <= 0)
+        {
+            // Detach from the file so fs_close_custom won't free it again.
+            ctx->file->pextension = NULL;
+            mem_free(ctx);
+            continue;
+        }
+        ctx->file->data = ctx->data;
+        ctx->file->len = len;
+        ctx->file->index = 0;
+        ctx->ready = true;
+        if (ctx->callback)
+            ctx->callback(ctx->callbackArg);
+        // ctx is freed by fs_close_custom once httpd finishes reading the file.
+    }
+}
+
+// Answer parked getPinState requests when the pin state changes.
+static void deliverPinState()
+{
+    const uint32_t state = readPinState();
+    if (hasDeliveredPinState && state == lastDeliveredPinState)
+        return;
+
+    bool hasParked = false;
+    for (int i = 0; i < MAX_PENDING_PIN_STATE; i++)
+    {
+        if (pendingPinState[i] != NULL)
+        {
+            hasParked = true;
+            break;
+        }
+    }
+    if (!hasParked)
+        return; // keep lastDelivered stale so the next client gets a snapshot
+
+    deliverToParked(state);
+    lastDeliveredPinState = state;
+    hasDeliveredPinState = true;
+}
+
+// Open a /api/getPinState request. Normally park it until the pin state
+// changes; answer immediately if there's an undelivered change or all park
+// slots are taken.
+static int openPinState(struct fs_file *file)
+{
+    const uint32_t state = readPinState();
+
+    if (!hasDeliveredPinState || state != lastDeliveredPinState)
+    {
+        deliverToParked(state); // don't leave parked clients on a stale change
+        lastDeliveredPinState = state;
+        hasDeliveredPinState = true;
+        return set_file_data(file, DataAndStatusCode(std::move(pinStateJson(state)), HttpStatusCode::_200));
+    }
+
+    PinStateFile *ctx = (PinStateFile *)mem_malloc(sizeof(PinStateFile));
+    if (ctx == NULL)
+        return 0;
+    ctx->file = file;
+    ctx->callback = NULL;
+    ctx->callbackArg = NULL;
+    ctx->ready = false;
+    ctx->data[0] = '\0';
+
+    for (int i = 0; i < MAX_PENDING_PIN_STATE; i++)
+    {
+        if (pendingPinState[i] == NULL)
+        {
+            pendingPinState[i] = ctx;
+            // httpd sees data==NULL / len==0: fs_is_file_ready parks the
+            // connection before any EOF check, so nothing is sent yet. On
+            // delivery we fill data/len/index and httpd resumes reading.
+            file->data = NULL;
+            file->len = 0;
+            file->index = 0;
+            file->pextension = ctx;
+            return 1;
+        }
+    }
+
+    mem_free(ctx);
+    return set_file_data(file, DataAndStatusCode(std::move(pinStateJson(state)), HttpStatusCode::_200));
+}
+
 std::string getPinState()
 {
     DynamicJsonDocument doc(LWIP_HTTPD_POST_MAX_PAYLOAD_LEN);
@@ -2650,6 +2825,8 @@ int fs_open_custom(struct fs_file *file, const char *name)
     {
         if (strcmp(handlerFunc.first, name) == 0)
         {
+            if (strcmp(handlerFunc.first, "/api/getPinState") == 0)
+                return openPinState(file);
             return set_file_data(file, handlerFunc.second());
         }
     }
@@ -2683,10 +2860,40 @@ int fs_open_custom(struct fs_file *file, const char *name)
     return 0;
 }
 
+// lwIP httpd asks whether a custom file can be read yet (async read). Every
+// file except a parked getPinState request is always ready.
+u8_t fs_canread_custom(struct fs_file *file)
+{
+    PinStateFile *ctx = (PinStateFile *)file->pextension;
+    if (ctx == NULL)
+        return 1;
+    return ctx->ready ? 1 : 0;
+}
+
+// lwIP httpd wants to be woken up when the file becomes readable: remember the
+// resume callback. Returns 1 to signal the read is delayed.
+u8_t fs_wait_read_custom(struct fs_file *file, fs_wait_cb callback_fn, void *callback_arg)
+{
+    PinStateFile *ctx = (PinStateFile *)file->pextension;
+    if (ctx == NULL)
+        return 0;
+    ctx->callback = callback_fn;
+    ctx->callbackArg = callback_arg;
+    return 1;
+}
+
 void fs_close_custom(struct fs_file *file)
 {
     if (file && file->is_custom_file && file->pextension)
     {
+        for (int i = 0; i < MAX_PENDING_PIN_STATE; i++)
+        {
+            if (pendingPinState[i] == file->pextension)
+            {
+                pendingPinState[i] = NULL;
+                break;
+            }
+        }
         mem_free(file->pextension);
         file->pextension = NULL;
     }

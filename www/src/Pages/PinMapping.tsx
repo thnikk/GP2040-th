@@ -194,17 +194,12 @@ const PinSection = memo(function PinSection({
 	}, [saveProfiles, submitTheme, updateUsedPins, t, showToast]);
 
 	const { svgContent, pinElements, loading, svgMode } = useBoardSVG();
-	const svgPinSet = useMemo(
-		() => new Set(pinElements.map((p) => p.pinNumber)),
-		[pinElements],
-	);
 	const [modalPin, setModalPin] = useState<number | null>(null);
 	const [ledPopover, setLedPopover] = useState<{
 		buttonName: string;
 		triggerRect: DOMRect;
 	} | null>(null);
 
-	const [listening, setListening] = useState(false);
 	const [pressedPins, setPressedPins] = useState<number[]>([]);
 	const stopRef = useRef(false);
 
@@ -213,7 +208,7 @@ const PinSection = memo(function PinSection({
 		try {
 			const data = await WebApi.getPinState();
 			if (data && data.heldPins) {
-				setPressedPins(data.heldPins.filter((p: number) => svgPinSet.has(p)));
+				setPressedPins(data.heldPins);
 			} else {
 				setPressedPins([]);
 			}
@@ -221,22 +216,19 @@ const PinSection = memo(function PinSection({
 			// Ignore errors
 		}
 		if (!stopRef.current) {
-			setTimeout(pollPins, 50);
+			// The board keeps the request open until a pin changes (long-poll);
+			// a short delay avoids hammering on immediate errors/responses.
+			setTimeout(pollPins, 20);
 		}
-	}, [svgPinSet]);
+	}, []);
 
 	useEffect(() => {
-		if (!listening) {
-			stopRef.current = true;
-			setPressedPins([]);
-			return;
-		}
 		stopRef.current = false;
 		pollPins();
 		return () => {
 			stopRef.current = true;
 		};
-	}, [listening, pollPins]);
+	}, [pollPins]);
 
 	useEffect(() => {
 		const handleBeforeUnload = () => {
@@ -281,10 +273,6 @@ const PinSection = memo(function PinSection({
 
 	const handleLedPopoverClose = useCallback(() => {
 		setLedPopover(null);
-	}, []);
-
-	const handleTestToggle = useCallback(() => {
-		setListening(l => !l);
 	}, []);
 
 	const handleModalClose = useCallback(() => {
@@ -369,7 +357,7 @@ const PinSection = memo(function PinSection({
 						onPinClick={handlePinClick}
 						onLedClick={onLedColorChange && animationMode === 5 ? handleLedClick : undefined}
 						highlightedPin={pressedPin}
-						highlightedPins={listening ? pressedPins : undefined}
+						highlightedPins={pressedPins}
 						dirtyPins={dirtyPins}
 						customTheme={customTheme}
 						animationMode={animationMode}
@@ -379,8 +367,6 @@ const PinSection = memo(function PinSection({
 						pinLedIndices={pinLedIndices}
 						ledButtonOrder={ledButtonOrder}
 						modeColors={modeColors}
-						listening={listening}
-						onTestToggle={handleTestToggle}
 						showPerKeyLeds={showPerKeyLeds}
 						showDisplay={showDisplay}
 					/>
