@@ -20,15 +20,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="2.8284271"
-     inkscape:cx="387.49452"
-     inkscape:cy="104.47503"
-     inkscape:window-width="2560"
-     inkscape:window-height="1440"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="392.79782"
+     inkscape:cy="39.951533"
+     inkscape:window-width="1261"
+     inkscape:window-height="678"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer2" /><desc
+     inkscape:current-layer="layer3" /><desc
      id="desc1">fbmx.dxf - scale = 1.000000, origin = (0.000000, 0.000000), method = manual</desc><defs
      id="defs4"><marker
        id="DistanceX"
@@ -224,7 +224,7 @@
        cy="161.18073"
        rx="9.3000002"
        ry="9.2898941" /><rect
-       style="display:inline;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="display:none;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="test-btn"
        width="50"
        height="20"
