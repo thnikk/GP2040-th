@@ -136,6 +136,8 @@ void MainMenuScreen::init() {
     updateChaseCycleTime = animOpts.chaseCycleTime;
     prevRippleCycleTime = animOpts.rippleCycleTime;
     updateRippleCycleTime = animOpts.rippleCycleTime;
+    prevFadeTime = animOpts.buttonPressColorCooldownTimeInMs;
+    updateFadeTime = animOpts.buttonPressColorCooldownTimeInMs;
 
     prevColorNormal = animOpts.staticColorNormal;
     updateColorNormal = prevColorNormal;
@@ -243,6 +245,18 @@ void MainMenuScreen::init() {
             return std::to_string(val) + "ms";
         };
         speedMenu.push_back(speedEntry);
+    }
+
+    fadeTimeMenu.clear();
+    {
+        MenuEntry fadeTimeEntry;
+        fadeTimeEntry.isSpinner = true;
+        fadeTimeEntry.currentValue = std::bind(&MainMenuScreen::currentFadeTime, this);
+        fadeTimeEntry.displayValue = [this]() -> std::string {
+            if (updateFadeTime == 0) return "Off";
+            return std::to_string(updateFadeTime) + "ms";
+        };
+        fadeTimeMenu.push_back(fadeTimeEntry);
     }
 
     {
@@ -519,6 +533,8 @@ void MainMenuScreen::updateMenuNavigation(GpioAction action) {
                             histSpinnerValueSnapshot = updateInputHistoryTimeout;
                         else if (currentMenu == &brightnessMenu)
                             brightnessSpinnerSnapshot = updateBrightness;
+                        else if (currentMenu == &fadeTimeMenu)
+                            fadeTimeSpinnerSnapshot = updateFadeTime;
                         else if (currentMenu == &colorNormalMenu) {
                             spinnerValueSnapshot = updateColorNormal;
                             currentSpinnerUnit = 0;
@@ -833,6 +849,10 @@ int32_t MainMenuScreen::currentSpeed() {
     return -1;
 }
 
+int32_t MainMenuScreen::currentFadeTime() {
+    return updateFadeTime;
+}
+
 int32_t MainMenuScreen::currentColorNormal() {
     return (int32_t)updateColorNormal;
 }
@@ -949,6 +969,12 @@ void MainMenuScreen::adjustSpinnerValue(int8_t direction) {
         else if (val < 0) val = 0;
         updateBrightness = val;
         if (prevBrightness != updateBrightness) changeRequiresSave = true;
+    } else if (currentMenu == &fadeTimeMenu) {
+        int32_t newVal = updateFadeTime + direction * 100;
+        if (newVal > 5000) newVal = 5000;
+        else if (newVal < 0) newVal = 0;
+        updateFadeTime = newVal;
+        if (prevFadeTime != updateFadeTime) changeRequiresSave = true;
     } else if (currentMenu == &colorNormalMenu || currentMenu == &colorPressedMenu) {
         uint32_t* color = (currentMenu == &colorNormalMenu) ? &updateColorNormal : &updateColorPressed;
         uint32_t* prev = (currentMenu == &colorNormalMenu) ? &prevColorNormal : &prevColorPressed;
@@ -1035,6 +1061,12 @@ void MainMenuScreen::saveSpinnerValue() {
             AnimationStation::SetBrightness(AnimationStation::options.brightness);
             AnimationStore.save();
         }
+    } else if (currentMenu == &fadeTimeMenu) {
+        if (fadeTimeSpinnerSnapshot != updateFadeTime) {
+            prevFadeTime = updateFadeTime;
+            AnimationStation::options.buttonPressColorCooldownTimeInMs = updateFadeTime;
+            AnimationStore.save();
+        }
     }
 }
 
@@ -1052,6 +1084,9 @@ void MainMenuScreen::revertSpinnerValue() {
     } else if (currentMenu == &brightnessMenu) {
         updateBrightness = brightnessSpinnerSnapshot;
         prevBrightness = brightnessSpinnerSnapshot;
+    } else if (currentMenu == &fadeTimeMenu) {
+        updateFadeTime = fadeTimeSpinnerSnapshot;
+        prevFadeTime = fadeTimeSpinnerSnapshot;
     } else if (currentMenu == &colorNormalMenu) {
         updateColorNormal = spinnerValueSnapshot;
         prevColorNormal = spinnerValueSnapshot;
