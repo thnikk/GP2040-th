@@ -70,7 +70,7 @@ void DisplayAddon::setup() {
             currDisplayMode = DisplayMode::BUTTONS;
         }
     } else {
-        currDisplayMode = DisplayMode::CONFIG_INSTRUCTION;
+        currDisplayMode = DisplayMode::BUTTONS;
     }
     gpScreen = nullptr;
     pendingScreenReturn = -1;
@@ -84,9 +84,6 @@ bool DisplayAddon::updateDisplayScreen() {
     if ( gpScreen != nullptr ) {
         gpScreen->shutdown();
         switch(prevDisplayMode) {
-            case CONFIG_INSTRUCTION:
-                delete (ConfigScreen*)gpScreen;
-                break;
             case SPLASH:
                 delete (SplashScreen*)gpScreen;
                 break;
@@ -99,14 +96,8 @@ bool DisplayAddon::updateDisplayScreen() {
             case BUTTONS:
                 delete (ButtonLayoutScreen*)gpScreen;
                 break;
-            case PIN_VIEWER:
-                delete (PinViewerScreen*)gpScreen;
-                break;
             case DISPLAY_SAVER:
                 delete (DisplaySaverScreen*)gpScreen;
-                break;
-            case STATS:
-                delete (StatsScreen*)gpScreen;
                 break;
             case RESTART:
                 delete (RestartScreen*)gpScreen;
@@ -117,9 +108,6 @@ bool DisplayAddon::updateDisplayScreen() {
         gpScreen = nullptr;
     }
     switch(currDisplayMode) {
-        case CONFIG_INSTRUCTION:
-            gpScreen = new ConfigScreen(gpDisplay);
-            break;
         case SPLASH:
             gpScreen = new SplashScreen(gpDisplay);
             break;
@@ -132,14 +120,8 @@ bool DisplayAddon::updateDisplayScreen() {
         case BUTTONS:
             gpScreen = new ButtonLayoutScreen(gpDisplay);
             break;
-        case PIN_VIEWER:
-            gpScreen = new PinViewerScreen(gpDisplay);
-            break;
         case DISPLAY_SAVER:
             gpScreen = new DisplaySaverScreen(gpDisplay);
-            break;
-        case STATS:
-            gpScreen = new StatsScreen(gpDisplay);
             break;
         case RESTART:
             gpScreen = new RestartScreen(gpDisplay);

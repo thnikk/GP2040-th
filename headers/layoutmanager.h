@@ -137,6 +137,8 @@ class LayoutManager {
     private:
         LayoutManager(){}
 
+        const DisplayOptions& getDisplayOptions();
+
         std::string getLayoutNameByID();
 
         LayoutManager::LayoutList getLeftLayout(uint16_t index);

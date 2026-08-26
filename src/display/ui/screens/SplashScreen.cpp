@@ -5,7 +5,6 @@
 void SplashScreen::init() {
     getRenderer()->clearScreen();
     splashStartTime = getMillis();
-    configMode = Storage::getInstance().GetConfigMode();
 }
 
 void SplashScreen::shutdown() {
@@ -42,20 +41,8 @@ void SplashScreen::drawScreen() {
 int8_t SplashScreen::update() {
     uint32_t elapsedDuration = getMillis() - splashStartTime;
     uint32_t splashDuration = getDisplayOptions().splashDuration;
-    if (!configMode) {
-        // still running
-        if (splashDuration != 0 && (elapsedDuration >= splashDuration)) {
-            return DisplayMode::BUTTONS;
-        }
-    } else {
-        uint16_t buttonState = getGamepad()->state.buttons;
-        if (prevButtonState && !buttonState) {
-            if (prevButtonState == GAMEPAD_MASK_B2) {
-                prevButtonState = 0;
-                return DisplayMode::CONFIG_INSTRUCTION;
-            }
-        }
-        prevButtonState = buttonState;
+    if (splashDuration != 0 && (elapsedDuration >= splashDuration)) {
+        return DisplayMode::BUTTONS;
     }
     return -1; // -1 means no change in screen state
 }

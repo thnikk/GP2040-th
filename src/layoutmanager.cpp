@@ -3,9 +3,13 @@
 #include "buttonlayouts.h"
 #include "enums.pb.h"
 
+const DisplayOptions& LayoutManager::getDisplayOptions() {
+    return Storage::getInstance().GetConfigMode() ? Storage::getInstance().getPreviewDisplayOptions() : Storage::getInstance().getDisplayOptions();
+}
+
 LayoutManager::LayoutList LayoutManager::getLayoutA() {
     const Config& config = Storage::getInstance().getConfig();
-    const DisplayOptions& options = Storage::getInstance().getDisplayOptions();
+    const DisplayOptions& options = getDisplayOptions();
     uint16_t layoutLeft = config.buttonLayout;
     if (options.buttonLayoutOrientation != BUTTON_ORIENTATION_DEFAULT) {
         uint16_t layoutRight = options.buttonLayoutRight;
@@ -22,7 +26,7 @@ LayoutManager::LayoutList LayoutManager::getLayoutA() {
 
 LayoutManager::LayoutList LayoutManager::getLayoutB() {
     const Config& config = Storage::getInstance().getConfig();
-    const DisplayOptions& options = Storage::getInstance().getDisplayOptions();
+    const DisplayOptions& options = getDisplayOptions();
     uint16_t layoutRight = config.buttonLayoutRight;
     if (options.buttonLayoutOrientation != BUTTON_ORIENTATION_DEFAULT) {
         uint16_t layoutLeft = config.buttonLayout;

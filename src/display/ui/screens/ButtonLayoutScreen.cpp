@@ -137,11 +137,11 @@ static std::string keyboardInputName(const KeyboardMapping& mapping, uint8_t ind
 }
 
 void ButtonLayoutScreen::init() {
-    isInputHistoryEnabled = Storage::getInstance().getDisplayOptions().inputHistoryEnabled;
-    inputHistoryX = Storage::getInstance().getDisplayOptions().inputHistoryRow;
-    inputHistoryY = Storage::getInstance().getDisplayOptions().inputHistoryCol;
-    inputHistoryLength = Storage::getInstance().getDisplayOptions().inputHistoryLength;
-    inputHistoryTimeout = Storage::getInstance().getDisplayOptions().inputHistoryTimeout;
+    isInputHistoryEnabled = getDisplayOptions().inputHistoryEnabled;
+    inputHistoryX = getDisplayOptions().inputHistoryRow;
+    inputHistoryY = getDisplayOptions().inputHistoryCol;
+    inputHistoryLength = getDisplayOptions().inputHistoryLength;
+    inputHistoryTimeout = getDisplayOptions().inputHistoryTimeout;
     lastInputTime = getMillis();
     bannerDelayStart = getMillis();
     gamepad = Storage::getInstance().GetGamepad();
@@ -174,9 +174,9 @@ void ButtonLayoutScreen::init() {
 
     prevLayoutLeft = Storage::getInstance().getConfig().buttonLayout;
     prevLayoutRight = Storage::getInstance().getConfig().buttonLayoutRight;
-    prevLeftOptions = Storage::getInstance().getDisplayOptions().buttonLayoutCustomOptions.paramsLeft;
-    prevRightOptions = Storage::getInstance().getDisplayOptions().buttonLayoutCustomOptions.paramsRight;
-    prevOrientation = Storage::getInstance().getDisplayOptions().buttonLayoutOrientation;
+    prevLeftOptions = getDisplayOptions().buttonLayoutCustomOptions.paramsLeft;
+    prevRightOptions = getDisplayOptions().buttonLayoutCustomOptions.paramsRight;
+    prevOrientation = getDisplayOptions().buttonLayoutOrientation;
 
     // we cannot look at macro options enabled, pull the pins
 
@@ -202,12 +202,12 @@ void ButtonLayoutScreen::init() {
     }
 
     // determine which fields will be displayed on the status bar
-    showInputMode = Storage::getInstance().getDisplayOptions().inputMode;
-    showTurboMode = Storage::getInstance().getDisplayOptions().turboMode;
-    showDpadMode = Storage::getInstance().getDisplayOptions().dpadMode;
-    showSocdMode = Storage::getInstance().getDisplayOptions().socdMode;
-    showMacroMode = Storage::getInstance().getDisplayOptions().macroMode;
-    showProfileMode = Storage::getInstance().getDisplayOptions().profileMode;
+    showInputMode = getDisplayOptions().inputMode;
+    showTurboMode = getDisplayOptions().turboMode;
+    showDpadMode = getDisplayOptions().dpadMode;
+    showSocdMode = getDisplayOptions().socdMode;
+    showMacroMode = getDisplayOptions().macroMode;
+    showProfileMode = getDisplayOptions().profileMode;
 
     getRenderer()->clearScreen();
 }
@@ -224,8 +224,8 @@ int8_t ButtonLayoutScreen::update() {
     if (configMode) {
         uint8_t layoutLeft = Storage::getInstance().getConfig().buttonLayout;
         uint8_t layoutRight = Storage::getInstance().getConfig().buttonLayoutRight;
-        uint8_t buttonLayoutOrientation = Storage::getInstance().getDisplayOptions().buttonLayoutOrientation;
-        bool inputHistoryEnabled = Storage::getInstance().getDisplayOptions().inputHistoryEnabled;
+        uint8_t buttonLayoutOrientation = getDisplayOptions().buttonLayoutOrientation;
+        bool inputHistoryEnabled = getDisplayOptions().inputHistoryEnabled;
         if ((prevLayoutLeft != layoutLeft) || (prevLayoutRight != layoutRight) || (isInputHistoryEnabled != inputHistoryEnabled) || compareCustomLayouts() || (prevOrientation != buttonLayoutOrientation)) {
             shutdown();
             init();
@@ -243,18 +243,6 @@ int8_t ButtonLayoutScreen::update() {
 	generateHeader();
     if (isInputHistoryEnabled)
 		processInputHistory();
-
-    // check for exit/screen change
-    if (Storage::getInstance().GetConfigMode()) {
-        uint16_t buttonState = getGamepad()->state.buttons;
-        if (prevButtonState && !buttonState) {
-            if (prevButtonState == GAMEPAD_MASK_B1) {
-                prevButtonState = 0;
-                return DisplayMode::CONFIG_INSTRUCTION;
-            }
-        }
-        prevButtonState = buttonState;
-    }
 
 	return -1;
 }
@@ -616,8 +604,8 @@ void ButtonLayoutScreen::processInputHistory() {
 
 bool ButtonLayoutScreen::compareCustomLayouts()
 {
-    ButtonLayoutParamsLeft leftOptions = Storage::getInstance().getDisplayOptions().buttonLayoutCustomOptions.paramsLeft;
-    ButtonLayoutParamsRight rightOptions = Storage::getInstance().getDisplayOptions().buttonLayoutCustomOptions.paramsRight;
+    ButtonLayoutParamsLeft leftOptions = getDisplayOptions().buttonLayoutCustomOptions.paramsLeft;
+    ButtonLayoutParamsRight rightOptions = getDisplayOptions().buttonLayoutCustomOptions.paramsRight;
 
     bool leftChanged = ((leftOptions.layout != prevLeftOptions.layout) || (leftOptions.common.startX != prevLeftOptions.common.startX) || (leftOptions.common.startY != prevLeftOptions.common.startY) || (leftOptions.common.buttonPadding != prevLeftOptions.common.buttonPadding) || (leftOptions.common.buttonRadius != prevLeftOptions.common.buttonRadius));
     bool rightChanged = ((rightOptions.layout != prevRightOptions.layout) || (rightOptions.common.startX != prevRightOptions.common.startX) || (rightOptions.common.startY != prevRightOptions.common.startY) || (rightOptions.common.buttonPadding != prevRightOptions.common.buttonPadding) || (rightOptions.common.buttonRadius != prevRightOptions.common.buttonRadius));
