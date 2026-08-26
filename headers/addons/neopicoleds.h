@@ -79,7 +79,6 @@
 #endif
 
 void configureAnimations(AnimationStation *as);
-AnimationHotkey animationHotkeys(Gamepad *gamepad);
 
 // Neo Pixel needs to tie into PlayerLEDS led Levels
 class NeoPicoPlayerLEDs : public PlayerLEDs

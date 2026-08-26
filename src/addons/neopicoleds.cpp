@@ -363,7 +363,6 @@ void NeoPicoLEDAddon::process()
     const TurboOptions& turboOptions = Storage::getInstance().getAddonOptions().turboOptions;
 
     Gamepad * gamepad = Storage::getInstance().GetProcessedGamepad();
-    AnimationHotkey action = animationHotkeys(gamepad);
     if (ledOptions.pledType == PLED_TYPE_RGB) {
         inputMode = gamepad->getOptions().inputMode; // HACK
         if (gamepad->auxState.playerID.enabled && gamepad->auxState.playerID.active) {
@@ -392,10 +391,6 @@ void NeoPicoLEDAddon::process()
         if (neoPLEDs != nullptr && animationState.animation != PLED_ANIM_NONE) {
             neoPLEDs->animate(animationState);
         }
-    }
-
-    if ( action != HOTKEY_LEDS_NONE ) {
-        as.HandleEvent(action);
     }
 
     if (as.options.baseAnimationIndex != lastMode) {
@@ -595,55 +590,4 @@ void NeoPicoLEDAddon::configureLEDs()
     as.SetMatrix(matrix);
     as.SetMode(as.options.baseAnimationIndex);
     lastMode = as.options.baseAnimationIndex;
-}
-
-AnimationHotkey animationHotkeys(Gamepad *gamepad)
-{
-    AnimationHotkey action = HOTKEY_LEDS_NONE;
-
-    if (gamepad->pressedS1() && gamepad->pressedS2())
-    {
-        if (gamepad->pressedB3())
-        {
-            action = HOTKEY_LEDS_ANIMATION_UP;
-            gamepad->state.buttons &= ~(GAMEPAD_MASK_B3 | GAMEPAD_MASK_S1 | GAMEPAD_MASK_S2);
-        }
-        else if (gamepad->pressedB1())
-        {
-            action = HOTKEY_LEDS_ANIMATION_DOWN;
-            gamepad->state.buttons &= ~(GAMEPAD_MASK_B1 | GAMEPAD_MASK_S1 | GAMEPAD_MASK_S2);
-        }
-        else if (gamepad->pressedR1())
-        {
-            action = HOTKEY_LEDS_PARAMETER_UP;
-            gamepad->state.buttons &= ~(GAMEPAD_MASK_R1 | GAMEPAD_MASK_S1 | GAMEPAD_MASK_S2);
-        }
-        else if (gamepad->pressedR2())
-        {
-            action = HOTKEY_LEDS_PARAMETER_DOWN;
-            gamepad->state.buttons &= ~(GAMEPAD_MASK_R2 | GAMEPAD_MASK_S1 | GAMEPAD_MASK_S2);
-        }
-        else if (gamepad->pressedL1())
-        {
-            action = HOTKEY_LEDS_PRESS_PARAMETER_UP;
-            gamepad->state.buttons &= ~(GAMEPAD_MASK_L1 | GAMEPAD_MASK_S1 | GAMEPAD_MASK_S2);
-        }
-        else if (gamepad->pressedL2())
-        {
-            action = HOTKEY_LEDS_PRESS_PARAMETER_DOWN;
-            gamepad->state.buttons &= ~(GAMEPAD_MASK_L2 | GAMEPAD_MASK_S1 | GAMEPAD_MASK_S2);
-        }
-        else if (gamepad->pressedL3())
-        {
-            action = HOTKEY_LEDS_FADETIME_DOWN;
-            gamepad->state.buttons &= ~(GAMEPAD_MASK_L3 | GAMEPAD_MASK_S1 | GAMEPAD_MASK_S2);
-        }
-        else if (gamepad->pressedR3())
-        {
-            action = HOTKEY_LEDS_FADETIME_UP;
-            gamepad->state.buttons &= ~(GAMEPAD_MASK_R3 | GAMEPAD_MASK_S1 | GAMEPAD_MASK_S2);
-        }
-    }
-
-    return action;
 }
