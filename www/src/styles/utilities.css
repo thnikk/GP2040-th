@@ -27,6 +27,10 @@
 	flex-wrap: nowrap;
 }
 
+.flex-grow-1 {
+	flex-grow: 1;
+}
+
 .justify-content-center {
 	justify-content: center;
 }

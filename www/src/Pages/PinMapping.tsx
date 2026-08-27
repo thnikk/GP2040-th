@@ -603,7 +603,7 @@ const submitTheme = useCallback(async () => {
 						<div className="card-section">
 							<div className="card-heading d-flex align-items-center gap-2"><Lightbulb />{t('CustomTheme:header-text')}</div>
 							<div className="d-flex align-items-center gap-3 flex-wrap">
-								<div className="d-flex align-items-center gap-2">
+								<div className="d-flex align-items-center gap-2 flex-grow-1">
 									<Form.Label className="mb-0">{t('CustomTheme:animation-label')}</Form.Label>
 									<TooltipTrigger
 										content={<Tooltip>{t('CustomTheme:animation-per-key-tooltip')}</Tooltip>}
@@ -613,6 +613,7 @@ const submitTheme = useCallback(async () => {
 									<Form.Select
 										value={animationMode}
 										onChange={handleAnimationModeChange}
+										className="flex-grow-1"
 										style={{ width: 'auto' }}
 									>
 										{ANIMATION_MODES.map(({ value, labelKey }) => (
@@ -622,25 +623,61 @@ const submitTheme = useCallback(async () => {
 										))}
 									</Form.Select>
 								</div>
-								{themeEnabled && (
-									<div className="d-flex align-items-center gap-2">
-										<Form.Label className="mb-0">{t('CustomTheme:preset-label')}</Form.Label>
-										<Form.Select
-											value={themeIndex}
-											onChange={handleThemeIndexChange}
-											style={{ width: 'auto' }}
-										>
-											{STATIC_THEMES.map((_, index) => (
-												<option key={index} value={index}>
-													{t(themeLabelKey(index))}
-												</option>
-											))}
-										</Form.Select>
-									</div>
-								)}
+								<div className="d-flex align-items-center gap-2 flex-grow-1">
+									<Form.Label className="mb-0">{t('CustomTheme:preset-label')}</Form.Label>
+									<Form.Select
+										value={themeIndex}
+										onChange={handleThemeIndexChange}
+										className="flex-grow-1"
+										disabled={!themeEnabled}
+										style={{ width: 'auto' }}
+									>
+										{STATIC_THEMES.map((_, index) => (
+											<option key={index} value={index}>
+												{t(themeLabelKey(index))}
+											</option>
+										))}
+									</Form.Select>
+								</div>
 							</div>
 							<div className="d-flex align-items-center gap-3 flex-wrap">
 								<Form.Label className="mb-0">{t('CustomTheme:parameters-label')}</Form.Label>
+								<div style={{ position: 'relative' }}>
+									<button type="button" className="led-color-btn" tabIndex={-1} disabled={!colorEnabled}>
+										<span
+											className="led-color-circle"
+											style={{ backgroundColor: staticColorNormal }}
+										/>
+										<span>{t('CustomTheme:normal-label')}</span>
+									</button>
+									<input
+										type="color"
+										value={staticColorNormal}
+										disabled={!colorEnabled}
+										onChange={(e) => setStaticColorNormal(e.target.value)}
+										style={{
+											position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer',
+										}}
+									/>
+								</div>
+								<div style={{ position: 'relative' }}>
+									<button type="button" className="led-color-btn" tabIndex={-1} disabled={!pressedEnabled}>
+										<span
+											className="led-color-circle"
+											style={{ backgroundColor: staticColorPressed }}
+										/>
+										<span>{t('CustomTheme:pressed-label')}</span>
+									</button>
+									<input
+										type="color"
+										value={staticColorPressed}
+										disabled={!pressedEnabled}
+										onChange={(e) => setStaticColorPressed(e.target.value)}
+										style={{
+											position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer',
+										}}
+									/>
+								</div>
 								<PillSlider
 									value={brightness}
 									min={0}
@@ -651,63 +688,24 @@ const submitTheme = useCallback(async () => {
 									unit=""
 									padLength={3}
 								/>
-								{colorEnabled && (
-									<div style={{ position: 'relative' }}>
-										<button type="button" className="led-color-btn" tabIndex={-1}>
-											<span
-												className="led-color-circle"
-												style={{ backgroundColor: staticColorNormal }}
-											/>
-											<span>{t('CustomTheme:normal-label')}</span>
-										</button>
-										<input
-											type="color"
-											value={staticColorNormal}
-											onChange={(e) => setStaticColorNormal(e.target.value)}
-											style={{
-												position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer',
-											}}
-										/>
-									</div>
-								)}
-								{pressedEnabled && (
-									<div style={{ position: 'relative' }}>
-										<button type="button" className="led-color-btn" tabIndex={-1}>
-											<span
-												className="led-color-circle"
-												style={{ backgroundColor: staticColorPressed }}
-											/>
-											<span>{t('CustomTheme:pressed-label')}</span>
-										</button>
-										<input
-											type="color"
-											value={staticColorPressed}
-											onChange={(e) => setStaticColorPressed(e.target.value)}
-											style={{
-												position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer',
-											}}
-										/>
-									</div>
-								)}
-								{speedEnabled && (
-									<PillSlider
-										value={speedValue}
-										min={speedMin}
-										max={2000}
-										onChange={setSpeedValue}
-									/>
-								)}
-								{pressedEnabled && (
-									<PillSlider
-										value={fadeTime}
-										min={0}
-										max={5000}
-										divisor={1}
-										unit="ms"
-										label="Fade time"
-										onChange={setFadeTime}
-									/>
-								)}
+								<PillSlider
+									value={speedValue}
+									min={speedMin}
+									max={2000}
+									onChange={setSpeedValue}
+									disabled={!speedEnabled}
+								/>
+								<PillSlider
+									value={fadeTime}
+									min={0}
+									max={5000}
+									divisor={1}
+									unit="ms"
+									label="Fade time"
+									onChange={setFadeTime}
+									disabled={!pressedEnabled}
+									padLength={4}
+								/>
 							</div>
 						</div>
 					)}

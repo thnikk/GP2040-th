@@ -1,5 +1,5 @@
 export default {
-	'animation-label': 'Animation',
+	'animation-label': 'Mode',
 	'preset-label': 'Preset',
 	'animation-mode-0': 'Static Color',
 	'animation-mode-1': 'Rainbow',
@@ -41,7 +41,7 @@ export default {
 	'normal-label': 'Normal',
 	'pressed-label': 'Pressed',
 	'custom-theme-colors': 'Custom theme colors',
-	'parameters-label': 'Parameters',
+	'parameters-label': 'Settings',
 	'no-led-for-action': 'No LED configuration available for this action type.',
 	'modal-title': 'Confirm Clear Custom Theme',
 	'modal-body':

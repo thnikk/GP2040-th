@@ -176,6 +176,7 @@
 
 .pill-slider {
 	position: relative;
+	flex-grow: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -199,11 +200,20 @@
 }
 
 .pill-slider-label {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	color: var(--gp-body-color);
 	font-size: 1rem;
 	font-weight: normal;
 	pointer-events: none;
 	z-index: 1;
+}
+
+.pill-slider-value {
+	display: inline-block;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
 }
 
 .pill-slider-label-fill {
@@ -220,6 +230,11 @@
 	font-weight: normal;
 	pointer-events: none;
 	z-index: 2;
+}
+
+.pill-slider-disabled {
+	opacity: 0.3;
+	cursor: not-allowed;
 }
 
 .btn.justify-content-start {
@@ -372,6 +387,11 @@
 .form-select:focus {
 	outline: none;
 	border-color: var(--gp-nord-9);
+}
+
+.form-select:disabled {
+	opacity: 0.3;
+	cursor: not-allowed;
 }
 
 .form-select-sm {

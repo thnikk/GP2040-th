@@ -130,6 +130,20 @@
 	background: rgba(0, 0, 0, 0.1);
 }
 
+.led-color-btn:disabled {
+	opacity: 0.3;
+	cursor: not-allowed;
+}
+
+.led-color-btn:disabled + input[type="color"] {
+	pointer-events: none;
+}
+
+.led-color-btn:disabled:hover {
+	border-color: rgba(0, 0, 0, 0.15);
+	background: rgba(0, 0, 0, 0.05);
+}
+
 .led-color-circle {
 	width: 16px;
 	height: 16px;
