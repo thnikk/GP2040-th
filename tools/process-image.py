@@ -64,34 +64,43 @@ def parse_padding(values):
         )
 
 
-def make_comparison(img1, img2):
-    """Stitch left half of img1 with right half of img2 side by side.
+def make_comparison(images):
+    """Stitch N images into equal-width columns side by side.
 
-    If heights differ, the taller image is resized to match the shorter.
-    A 2px white vertical line marks the stitch boundary.
+    If heights differ, taller images are resized to match the shortest.
+    Each image is cropped to a column of width w // N, with image i
+    taking the column at fraction i/N. 2px white vertical lines mark
+    the column boundaries.
     """
-    a = img1.convert('RGBA')
-    b = img2.convert('RGBA')
+    images = [img.convert('RGBA') for img in images]
+    n = len(images)
 
-    # Normalize heights — resize the taller to match the shorter
-    if a.height > b.height:
-        ratio = b.height / a.height
-        a = a.resize((round(a.width * ratio), b.height), Image.LANCZOS)
-    elif b.height > a.height:
-        ratio = a.height / b.height
-        b = b.resize((round(b.width * ratio), a.height), Image.LANCZOS)
+    # Normalize heights — resize taller images to match the shortest
+    shortest = min(img.height for img in images)
+    for i, img in enumerate(images):
+        if img.height > shortest:
+            ratio = shortest / img.height
+            images[i] = img.resize(
+                (round(img.width * ratio), shortest), Image.LANCZOS
+            )
 
-    h = a.height  # now equal
+    h = shortest
+    col_width = max(1, min(img.width for img in images) // n)
 
-    left = a.crop((0, 0, a.width // 2, h))
-    right = b.crop((b.width // 2, 0, b.width, h))
-
-    canvas = Image.new('RGBA', (left.width + right.width, h), (0, 0, 0, 0))
-    canvas.paste(left, (0, 0))
-    canvas.paste(right, (left.width, 0))
-
+    canvas = Image.new(
+        'RGBA', (col_width * n + 2 * (n - 1), h), (0, 0, 0, 0)
+    )
     draw = ImageDraw.Draw(canvas)
-    draw.line([(left.width, 0), (left.width, h)], fill=(255, 255, 255, 255), width=2)
+
+    for i, img in enumerate(images):
+        x = i * (col_width + 2)
+        col = img.crop((i * col_width, 0, (i + 1) * col_width, h))
+        canvas.paste(col, (x, 0))
+        if i < n - 1:
+            draw.line(
+                [(x + col_width, 0), (x + col_width, h)],
+                fill=(255, 255, 255, 255), width=2
+            )
 
     return canvas
 
@@ -101,12 +110,18 @@ def main():
         description='Process PNG images: round corners, add padding, '
         'add drop shadow, or create a side-by-side comparison.'
     )
-    parser.add_argument('input', help='Input PNG file')
-    parser.add_argument('output', help='Output PNG file')
     parser.add_argument(
-        '-c', '--compare', type=str, default=None,
-        help='Second image for side-by-side comparison '
-        '(left half of input + right half of second image)'
+        '-i', '--input',
+        help='Input PNG file (leftmost column when combined with -c)'
+    )
+    parser.add_argument(
+        '-o', '--output', required=True,
+        help='Output PNG file'
+    )
+    parser.add_argument(
+        '-c', '--compare', type=str, nargs='+', default=None,
+        help='Images for side-by-side comparison (each adds one '
+        'column; if -i is omitted, the first is the leftmost column)'
     )
     parser.add_argument(
         '-r', '--radius', type=int, default=None,
@@ -127,10 +142,15 @@ def main():
     if args.expand is not None:
         args.expand = parse_padding(args.expand)
 
+    if args.input is None and args.compare is None:
+        parser.error('either -i or -c is required')
+
     if args.compare is not None:
-        a = Image.open(args.input).convert('RGBA')
-        b = Image.open(args.compare).convert('RGBA')
-        image = make_comparison(a, b)
+        if args.input is not None:
+            paths = [args.input] + args.compare
+        else:
+            paths = args.compare
+        image = make_comparison([Image.open(p).convert('RGBA') for p in paths])
     else:
         image = Image.open(args.input).convert('RGBA')
 
